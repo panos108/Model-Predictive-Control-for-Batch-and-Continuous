@@ -1,6 +1,5 @@
 from casadi import *
 import numpy as np
-#from Dynamic_system import Model_Def#specifications, DAE_system, integrator_model
 from OrthogonalCollocation import perform_orthogonal_collocation, construct_polynomials_basis
 
 class MPC:
