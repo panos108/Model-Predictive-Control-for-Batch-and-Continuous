@@ -3,7 +3,7 @@ import numpy as np
 from casadi import *
 
 
-class Model_definition:
+class Bio_reactor:
 
     def specifications(self):
         ''' Specify Problem parameters '''
