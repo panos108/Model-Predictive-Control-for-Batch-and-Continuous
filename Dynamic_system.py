@@ -69,6 +69,7 @@ class Bio_reactor:
         # Declare ODE equations (use notation as defined above)
 
         dx   = u_m * L/(L+k_s+L**2./k_i) * x * n/(n+K_N) - u_d*x
+        dx   = u_m * L/(L+k_s+L**2./k_i) * x * n/(n+K_N) - u_d*x
         dn   = - Y_nx*u_m* L/(L+k_s+L**2./k_i) * x * n/(n+K_N)+ Fn
         dq   = (k_m * L/(L+k_sq+L**2./k_iq) * x - k_d * q/(n+K_Np))# * (sign(499.9999 - n)+1)/2 * (sign(x - 10.0001)+1)/2
 
@@ -126,7 +127,7 @@ class simple_CSTR:
 
     def specifications(self):
         ''' Specify Problem parameters '''
-        dt                = 0.01      # final time
+        dt                = 0.1      # final time
         x0                = np.array([0.])
         Lsolver           = 'mumps'  #'ma97'  # Linear solver
         c_code            = False    # c_code
@@ -269,8 +270,8 @@ class different_CSTR:
         for i in range(nmp):
             globals()[modpar[i]] = SX(modparval[i])# + uncertainty[i])
 
-        dx1   = u_scale * u / V * (C0 -x1) - k * x1
-        dx2  = -u_scale * u/  V * x2        + k * x1
+        dx1   = u_scale * u / V * (C0 -x1) - k * x1**3
+        dx2  = -u_scale * u/  V * x2        + k * x1**3
         ODEeq =  [dx1, dx2]
 
         # Declare algebraic equations

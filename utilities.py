@@ -97,15 +97,15 @@ class MPC:
             u_plot += [Uk]
 
 # Integrate till the end of the interval
-            w, lbw, ubw, w0, g, lbg, ubg, Xk, x_plot = self.perform_orthogonal_collocation(dc, self.nd, w, lbw, ubw, w0,
+            w, lbw, ubw, w0, g, lbg, ubg, Xk, x_plot, J = self.perform_orthogonal_collocation(dc, self.nd, w, lbw, ubw, w0,
                                                  self.x_min, self.x_max,
                                                  D, Xk, i, C, self.f, Uk, dt,
-                                                 g, lbg, ubg, shrink[i], x_plot)#F1(x0=Xk, p=Uk, y=yk)#, DT=DTk)
+                                                 g, lbg, ubg, shrink[i], x_plot, B, J, x_ref)#F1(x0=Xk, p=Uk, y=yk)#, DT=DTk)
             for ig in range(self.ng):
                 g   += [self.gfcn(Xk, x_ref,    Uk)[ig]*shrink[i]]
                 lbg += [-inf]
                 ubg += [0.]
-            J+= self.Obj_L(Xk, x_ref,  Uk) * shrink[i]
+            J+= self.Obj_D(Xk, x_ref,  Uk) * shrink[i]
         J +=  self.Obj_M(Xk, x_ref,  Uk)
         if self.penalize_u:
             p  = []
@@ -164,7 +164,7 @@ class MPC:
         return u_opt, x_opt, w_opt
 
     def perform_orthogonal_collocation(self,d, nx, w, lbw, ubw, w0, lbx, ubx, D, Xk, s, C, f, Uk,
-                                       h, g, lbg, ubg, shrink, x_plot):
+                                       h, g, lbg, ubg, shrink, x_plot, B, J, x_ref):
         """
 
         :return:
@@ -195,7 +195,7 @@ class MPC:
             ubg.extend([0.] * nx)
 
             for ig in range(self.ng):
-                g   += [self.gfcn(Xc[j-1], 0, Uk)[ig]*shrink]
+                g   += [self.gfcn(Xc[j-1], x_ref, Uk)[ig]*shrink]
                 lbg += [-inf]
                 ubg += [0.]
             # Add contribution to the end state
@@ -205,7 +205,9 @@ class MPC:
         #                    count[k] = 1
         #                    j1 += 1
         # Add contribution to quadrature function
-        #      J = J + B[j]*qj*h
+            qj = self.Obj_L(Xc[j - 1], x_ref,Uk) * shrink  #
+
+            J += B[j]*qj*h
 
         # New NLP variable for state at end of interval
         Xk = SX.sym('X_' + str(s + 1), nx)
@@ -219,4 +221,4 @@ class MPC:
         lbg.extend([0.] * nx)
         ubg.extend([0.] * nx)
 
-        return w, lbw, ubw, w0, g, lbg, ubg, Xk, x_plot
+        return w, lbw, ubw, w0, g, lbg, ubg, Xk, x_plot, J
