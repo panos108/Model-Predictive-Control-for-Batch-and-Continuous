@@ -3,7 +3,7 @@ import numpy as np
 csfp = os.path.abspath(os.path.dirname(__file__))
 if csfp not in sys.path:
     sys.path.insert(0, csfp)
-from OrthogonalCollocation import perform_orthogonal_collocation, construct_polynomials_basis
+from OrthogonalCollocation import construct_polynomials_basis
 
 class MPC:
 

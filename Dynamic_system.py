@@ -127,7 +127,7 @@ class simple_CSTR:
 
     def specifications(self):
         ''' Specify Problem parameters '''
-        dt                = 0.1      # final time
+        dt                = 0.01      # final time
         x0                = np.array([0.])
         Lsolver           = 'mumps'  #'ma97'  # Linear solver
         c_code            = False    # c_code
