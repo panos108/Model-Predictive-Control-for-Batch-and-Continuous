@@ -1,6 +1,6 @@
 from casadi import *
 import numpy as np
-from Dynamic_system import Model_definition as System#specifications, DAE_system, integrator_model
+from Dynamic_system import Bio_reactor as System#specifications, DAE_system, integrator_model
 from OrthogonalCollocation import perform_orthogonal_collocation, construct_polynomials_basis
 from utilities import MPC
 import matplotlib.pyplot as plt
