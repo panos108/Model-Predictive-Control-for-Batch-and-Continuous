@@ -135,7 +135,7 @@ class MPC:
     def solve_MPC(self, x, ref=None, u=None, t=0.):
 
         if self.n_ref>0:
-            p0 = np.concatenate((x, np.array([ref])))
+            p0 = np.concatenate((x, np.array([ref]).reshape((-1,))))
         else:
             p0 = x
 
@@ -158,7 +158,8 @@ class MPC:
                      p=p0)
         w_opt = sol['x'].full().flatten()
         x_opt, u_opt = self. trajectories(sol['x'])
-
+        if self.solver.stats()['return_status'] != 'Solve_Succeeded':
+            print('Opt failed')
         if self.shrinking_horizon:
             self.steps += - 1
         return u_opt, x_opt, w_opt
@@ -177,7 +178,7 @@ class MPC:
             w += [Xkj]
             lbw.extend(lbx)
             ubw.extend(ubx)
-            w0.extend([0] * nx)
+            w0.extend([1.] * nx)
             x_plot+= [Xkj]
         # Loop over collocation points
         Xk_end = D[0] * Xk
@@ -191,8 +192,8 @@ class MPC:
             # Append collocation equations
             fj = f(Xc[j - 1], Uk) * shrink  #
             g += [(h * fj - xp)]
-            lbg.extend([0.] * nx)
-            ubg.extend([0.] * nx)
+            lbg.extend([-1e-8] * nx)
+            ubg.extend([1e-8] * nx)
 
             for ig in range(self.ng):
                 g   += [self.gfcn(Xc[j-1], x_ref, Uk)[ig]*shrink]

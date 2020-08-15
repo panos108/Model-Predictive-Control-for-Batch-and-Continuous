@@ -1,7 +1,6 @@
 from casadi import *
 import numpy as np
 from Dynamic_system import simple_CSTR as System#specifications, DAE_system, integrator_model
-from OrthogonalCollocation import perform_orthogonal_collocation, construct_polynomials_basis
 from utilities import MPC
 import matplotlib.pyplot as plt
 T = 1.  # Time horizon
@@ -23,7 +22,7 @@ N = 12  # number of control intervals
 
 # Fixed step Runge-Kutta 4 integrator
 
-MPC_ = MPC(System, 100, penalize_u=True)
+MPC_ = MPC(System, 100, penalize_u=False, collocation_degree=8)
 Sys = System()
 dt, x0, _, _, _ = Sys.specifications()
 F = Sys.integrator_model()
