@@ -8,7 +8,7 @@ class Bio_reactor:
     def specifications(self):
         ''' Specify Problem parameters '''
         tf              = 240.      # final time
-        nk              = 12        # sampling points
+        nk              = 6        # sampling points
         dt              = tf/nk
         x0              = np.array([1.,150.,0.])
         Lsolver         = 'mumps'  #'ma97'  # Linear solver
@@ -115,7 +115,7 @@ class Bio_reactor:
 
         dae = {'x': vertcat(xd), 'z': vertcat(xa), 'p': vertcat(u, uncertainty),
                'ode': vertcat(*ODEeq), 'alg': vertcat(*Aeq)}
-        opts = {'tf': 240/12}  # interval length
+        opts = {'tf': 240/6}  # interval length
         F = integrator('F', 'idas', dae, opts)
 
         return F

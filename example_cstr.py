@@ -22,7 +22,7 @@ N = 12  # number of control intervals
 
 # Fixed step Runge-Kutta 4 integrator
 
-MPC_ = MPC(System, 100, penalize_u=False, collocation_degree=8)
+MPC_ = MPC(System, 100, penalize_u=True, collocation_degree=8)
 Sys = System()
 dt, x0, _, _, _ = Sys.specifications()
 F = Sys.integrator_model()

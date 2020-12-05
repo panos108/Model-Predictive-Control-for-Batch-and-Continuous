@@ -162,6 +162,7 @@ class MPC:
             print('Opt failed')
         if self.shrinking_horizon:
             self.steps += - 1
+        self.obj = sol['f'].full().flatten()
         return u_opt, x_opt, w_opt
 
     def perform_orthogonal_collocation(self,d, nx, w, lbw, ubw, w0, lbx, ubx, D, Xk, s, C, f, Uk,
@@ -223,3 +224,57 @@ class MPC:
         ubg.extend([0.] * nx)
 
         return w, lbw, ubw, w0, g, lbg, ubg, Xk, x_plot, J
+
+
+class cosntract_history:
+    def __init__(self, model, N, store_u = True, set_point0 = 0.):
+        #Define self vars
+        dt, x0, Lsolver, c_code, specifications = model.specifications()
+
+        xd, xa, u, uncertainty, ODEeq, Aeq, u_min, u_max, x_min, x_max, states, \
+        algebraics, inputs, nd, na, nu, n_ref, nmp, modparval, ng, gfcn, Obj_M, \
+        Obj_L, Obj_D, R = model.DAE_system()
+
+        self.model   = model           # The model defined in terms of casadi
+        self.N       = N               # Number of past data
+        self.store_u = store_u
+        self.nx      = nd
+        self.nu      = nu
+        self.nsp     = len(set_point0)
+        self.u_min   = u_min
+        self.u_max   = u_max
+        state_0, e_sp0 = x0, x0-set_point0#model.reset(set_point0)
+        # initialize history
+        history_x = np.array([*state_0]*N).reshape((-1,1))
+        history_sp = np.array([*e_sp0]*N).reshape((-1,1))
+
+        if store_u:                  # If u are stored as history (simple RNN structure)
+            history_u = np.array([0]*N*self.nu).reshape((-1,1))
+            self.history = np.vstack((history_x,history_sp,history_u))
+            self.size_states = N * (self.nu + self.nx + self.nsp)
+        else:
+            self.history = np.vstack((history_x,history_sp))
+            self.size_states = N * (self.nx+self.nsp)
+
+        self.history = self.history.reshape((-1,))
+        # start counting the past values
+        self.past = 1
+
+
+    def append_history(self, new_state, u, e_sp):
+
+        if self.store_u:
+            n = self.nx+self.nu + self.nsp
+            self.history[n:] = self.history[:n*(self.N-1)]
+            aug_states = np.concatenate((new_state, e_sp, u))
+            self.history[:n] = aug_states
+
+        else:
+            n = self.nx+ self.nsp
+            self.history[n:] = self.history[:n*(self.N-1)]
+            aug_states = np.concatenate((new_state, e_sp))
+
+            self.history[:n] = aug_states
+        self.past +=1
+
+        return self.history

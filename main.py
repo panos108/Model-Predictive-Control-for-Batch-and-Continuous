@@ -4,7 +4,7 @@ from Dynamic_system import Bio_reactor as System#specifications, DAE_system, int
 from utilities import MPC
 import matplotlib.pyplot as plt
 T = 1.  # Time horizon
-N = 12  # number of control intervals
+N = 6  # number of control intervals
 
 
 # nk, tf, x0, Lsolver, c_code = specifications()
@@ -37,7 +37,7 @@ F = Sys.integrator_model()
 his_x = np.zeros([1000, len(x0)])
 his_u= np.zeros([1000, 2])
 t    = 0.
-for i in range(12):
+for i in range(6):
     his_x[i] = x0
     u_opt, x_opt, w_opt = MPC_.solve_MPC(x=x0, t=t)
 
